@@ -1,7 +1,7 @@
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
 from .forms import CustomUserCreationForm
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView, LogoutView
 from django.views. generic import TemplateView
 # Create your views here.
 
@@ -18,3 +18,6 @@ class CustomLoginView(LoginView):
 
 class HomePageView(TemplateView):
     template_name = 'home.html'
+
+class CustomLogoutView(LogoutView):
+    next_page = reverse_lazy('home')
