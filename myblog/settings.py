@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_bootstrap4',
     'accounts.apps.AccountsConfig',
+    'blog.app.BlogConfig',
 ]
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
