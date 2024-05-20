@@ -1,35 +1,69 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Post List</title>
-    <!-- Add your CSS links here -->
-</head>
-<body>
-    {% block content %}
-    <h1>Post List</h1>
-    <ul>
-        {% for post in posts %}
-            <li>
-                <h2><a href="#">{{ post.title }}</a></h2>
-                <p>Author: {{ post.author }}</p>
-                <p>Published at: {{ post.published_at }}</p>
-                <p>Categories:
-                    {% for category in post.categories.all %}
-                        <a href="#">{{ category.name }}</a>{% if not forloop.last %}, {% endif %}
-                    {% endfor %}
-                </p>
-                <p>Tags:
-                    {% for tag in post.tags.all %}
-                        <a href="#">{{ tag.name }}</a>{% if not forloop.last %}, {% endif %}
-                    {% endfor %}
-                </p>
-            </li>
-        {% endfor %}
-    </ul>
-    {% endblock %}
-</body>
-</html>
+{% load static%}
+
+{% block title %}Blog Posts{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Blog Posts</h1>
+    <div class="row">
+        <div class="col-lg-8">
+            {% for post in page_obj.object_list %}
+                <div class="card mb-4">
+                    {% if post.featured_image %}
+                        <img class="card-img-top" src="{{ post.featured_image.url }}" alt="{{ post.title }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h2 class="card-title">{{ post.title }}</h2>
+                        {{ post.body|truncatewords:30|linebreaks}}
+                        <a href="{% url 'post_detail' post.slug %}" class="btn btn-primary">Read More &rarr;</a>
+                    </div>
+                    <div class="card-footer text-muted">
+                        Posted on {{ post.date_created|date:"F d, Y" }} by {{ post.author.username }}
+                    </div>
+                </div>
+            {% endfor %}
+            <div class="pagination justify-content-center">
+                {% if is_paginated %}
+                    <ul class="pagination">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">&laquo;</span>
+                            </li>
+                        {% endif %}
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                            {% elif num > page_obj.number|add:-3 and num < page_obj.number|add:3 %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">&raquo;</span>
+                            </li>
+                        {% endif %}
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
