@@ -11,12 +11,15 @@
         <div class="col-lg-8">
             {% for post in page_obj.object_list %}
                 <div class="card mb-4">
-                    {% if post.featured_image %}
-                        <img class="card-img-top" src="{{ post.featured_image.url }}" alt="{{ post.title }}">
-                    {% endif %}
+                    
                     <div class="card-body">
                         <h2 class="card-title">{{ post.title }}</h2>
                         {{ post.body|truncatewords:30|linebreaks}}
+                    </div>
+                    {% if post.featured_image %}
+                        <img class="card-img-top w-25" src="{{ post.featured_image.url }}" alt="{{ post.title }}">
+                    {% endif %}
+                    <div class="card-body">
                         <a href="{% url 'post_detail' post.slug %}" class="btn btn-primary">Read More &rarr;</a>
                     </div>
                     <div class="card-footer text-muted">

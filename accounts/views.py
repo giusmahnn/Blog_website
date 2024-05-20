@@ -1,6 +1,6 @@
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
-from django.contrib.auth import logout
+from django.contrib.auth import login
 from django.shortcuts import HttpResponseRedirect
 from .forms import CustomUserCreationForm
 from django.contrib.auth.views import LoginView
@@ -22,6 +22,10 @@ class HomePageView(TemplateView):
     template_name = 'home.html'
 
 
-def logout_view(request):
-    logout(request)
-    return HttpResponseRedirect('/')  # Redirect to homepage after logout
+
+    
+
+
+def login_view(request):
+    login(request)
+    return HttpResponseRedirect('login/')  # Redirect to homepage after logout
