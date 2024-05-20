@@ -27,7 +27,7 @@ def login_view(request):
 
             if user is not None:
                 login(request, user)
-                return redirect('blog/home')
+                return redirect('post_list')
     else:
         form = CustomLoginForm()
     
