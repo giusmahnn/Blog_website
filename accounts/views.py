@@ -1,13 +1,15 @@
-from django.urls import reverse_lazy
+from django.shortcuts import redirect, render
+from .forms import CustomUserCreationForm, CustomLoginForm
+from django.contrib.auth import login, logout, authenticate
 from django.views.generic import CreateView
-from django.contrib.auth import login
-from django.shortcuts import HttpResponseRedirect
-from .forms import CustomUserCreationForm
-from django.contrib.auth.views import LoginView
-from django.views. generic import TemplateView
+from django.urls import reverse_lazy
+
+#from django.views. generic import TemplateView
 # Create your views here.
 
 
+def home_view(request):
+    return render(request, 'home.html')
 
 class CustomSignUpView(CreateView):
     form_class = CustomUserCreationForm
@@ -15,17 +17,32 @@ class CustomSignUpView(CreateView):
     template_name = 'signup.html'
 
 
-class CustomLoginView(LoginView):
-    template_name = 'login.html'
+def login_view(request):
+    if request.method == 'POST':
+        form = CustomLoginForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user = authenticate(request, username=username, password=password)
 
-class HomePageView(TemplateView):
-    template_name = 'home.html'
+            if user is not None:
+                login(request, user)
+                return redirect('blog/home')
+    else:
+        form = CustomLoginForm()
+    
+    return render(request, 'registration/login.html', {'form': form})
+
+
+
+
+def logout_view(request):
+    if request.method == 'POST':
+        logout(request)
+    return redirect('home')
 
 
 
     
 
 
-def login_view(request):
-    login(request)
-    return HttpResponseRedirect('login/')  # Redirect to homepage after logout
