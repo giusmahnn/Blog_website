@@ -4,6 +4,9 @@ from django.db import models
 # Create your models here.
 
 class CustomUser(AbstractUser):
+    '''
+    species aditional fields in django built in user creation form
+    '''
     age = models.PositiveIntegerField(null=True, blank=True)
     email = models.EmailField(unique=True)
 

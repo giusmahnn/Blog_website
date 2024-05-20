@@ -17,22 +17,6 @@ class CustomUserCreationForm(UserCreationForm):
             'age',
         )
 
-    def clean_email(self):
-        email = self.cleaned_data['email']
-
-        if not email or not email.strip():
-            raise forms.ValidationError("Input a correct email address")
-        
-        if CustomUser.objects.filter(email__iexact=email).exists:
-            raise forms.ValidationError("Email address already exists")
-        return email
-    
-    def clean_username(self):
-        username = self.cleaned_data['username']
-
-        if CustomUser.objects.filter(username__iexact=username).exists:
-            raise forms.ValidationError("Username already exists")
-        return username
     
     def save(self, commit=True):
         user = super(CustomUserCreationForm, self).save(commit=False)
