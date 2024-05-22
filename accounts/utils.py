@@ -2,6 +2,7 @@ import random
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
+from django.conf import settings
 
 
 def otp_generation():
@@ -11,17 +12,36 @@ def otp_generation():
 
 
 
-def send_email(user, otp, domain):
-    subject = "Password Reset Requested"
-    from_email = 'admin@myblog.com'
-    to_email = user.email
-    context = {
-        'username': user.username,
-        'otp': otp,
-        'domain': domain,
-    }
-    html_content = render_to_string('registration/password_reset_otp_email.html', context)
-    text_content = strip_tags(html_content)
-    email = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
-    email.attach_alternative(html_content, "text/html")
-    email.send()
+def send_email(user_email, template, subject):
+    subject = subject
+    from_email = settings.EMAIL_HOST_USER
+    to_email = [user_email]
+
+    email = EmailMultiAlternatives(
+        subject = subject,
+        body = "This is the body of the email",
+        from_email = from_email,
+        to=to_email,
+    )
+
+    email.content_subtype = "text/html"
+    email.attach_alternative(template, "text/html")
+
+    try:
+        email.send(fail_silently=False)
+    except Exception as e:
+        print("Email sending failed", {e})
+        return "Couldn't connect, try again"
+    return None
+
+
+
+
+
+
+
+
+
+    
+    
+    

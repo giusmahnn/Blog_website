@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Users</h1>
+
+{% for user in user_list %}
+    <p style="color: rgb(0, 255, 42);">{{user.username}}</p>
+    <p style="color: red;">{{user.age}}</p>
+
+{% endfor %}
+{% endblock %}
