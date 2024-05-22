@@ -1,8 +1,19 @@
 from django.shortcuts import redirect, render
-from .forms import CustomUserCreationForm, CustomLoginForm
-from django.contrib.auth import login, logout, authenticate
-from django.views.generic import CreateView
+from .forms import (CustomUserCreationForm,
+                    CustomLoginForm,
+                    CustomUserChangeForm,
+                    PasswordResetRequestForm,
+                    SetPasswordForm,
+                    OTPValidationForm)
+from django.contrib.auth import login, logout, authenticate, get_user_model
+from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
+from django.contrib.auth.models import User
+from django.utils.http import urlsafe_base64_decode
+from django.utils.encoding import force_str
+from django.contrib import messages
+from .utils import send_email
+from django.views import View
 
 # Create your views here.
 
@@ -26,6 +37,22 @@ def signup_view(request):
     return render(request, 'signup.html', {'form': form})
 
 
+
+@login_required
+def profile_view(request):
+    if request.method == 'GET':
+        form = CustomUserChangeForm(instance=request.user)
+    elif request.method == 'POST':
+        form = CustomUserChangeForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('profile')
+    return render(request, 'profile_edit.html', {'form': form})
+
+@login_required
+def my_profile(request):
+    return render(request, 'profile.html', {'user': request.user})
+
 def login_view(request):
     '''
     creates an instance for the user to impute the login details, it then extracts the username and 
@@ -48,16 +75,69 @@ def login_view(request):
     
     return render(request, 'registration/login.html', {'form': form})
 
-
-
-
 def logout_view(request):
     if request.method == 'POST':
         logout(request)
     return redirect('home')
 
+User = get_user_model()    
+def password_reset_request(request):
+    if request.method == "POST":
+        form = PasswordResetRequestForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data['email']
+            associated_users = User.objects.filter(email=data)
+            if associated_users.exists():
+                for user in associated_users:
+                    # Generate and save OTP
+                    user.save_otp()
+
+                    # Send the email
+                    try:
+                        send_email(user, request.META['HTTP_HOST'])
+                        messages.success(request, 'A password reset OTP has been sent to your email.')
+                        return redirect('password_reset_done')
+                    except Exception as e:
+                        messages.error(request, f'Error sending email: {e}')
+                        return render(request, "registration/password_reset.html", {"form": form})
+            else:
+                messages.error(request, 'No user is associated with this email address.')
+                return render(request, "registration/password_reset.html", {"form": form})
+            return redirect('password_reset_otp')
+    else:
+        form = PasswordResetRequestForm()
+    return render(request, "registration/password_reset.html", {"form": form})
 
 
-    
+def password_reset_confirm(request, uidb64=None):
+    if request.method == "POST":
+        form = OTPValidationForm(request.POST)
+        if form.is_valid():
+            uid = force_str(urlsafe_base64_decode(uidb64))
+            try:
+                user = User.objects.get(pk=uid)
+            except User.DoesNotExist:
+                messages.error(request, "Invalid user.")
+                return render(request, "registration/password_reset_confirm.html", {"form": form})
+            
+            if user.otp_is_valid() and form.cleaned_data['otp'] == user.otp:
+                user.set_password(form.cleaned_data['new_password1'])
+                user.otp = None  # Clear the OTP after successful password reset
+                user.otp_created_at = None
+                user.save()
+                messages.success(request, "Your password has been set. You can now log in.")
+                return redirect("/password_reset_complete/")
+            else:
+                messages.error(request, "Invalid OTP or OTP has expired.")
+                return render(request, "registration/password_reset_confirm.html", {"form": form})
+        else:
+            messages.error(request, "Please correct the error below.")
+    else:
+        form = OTPValidationForm()
+    return render(request, "registration/password_reset_confirm.html", {"form": form})
 
+def password_reset_done(request):
+    return render(request, "registration/password_reset_done.html")
 
+def password_reset_complete(request):
+    return render(request, "registration/password_reset_complete.html")

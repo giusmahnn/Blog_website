@@ -6,7 +6,6 @@
     <title>{% block title %}My Blog{% endblock %}</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     {% load static %}
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     {% block extra_head %}{% endblock %}
 </head>
 <body>
@@ -19,13 +18,16 @@
             <ul class="navbar-nav ml-auto">
                 {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Hello, {{ user.username }}!</a>
+                        <a class="nav-link" href="{% url 'profile' %}">Hello, {{ user.username }}!</a>
                     </li>
                     <li class="nav-item">
                         <form method="POST" action="{% url 'logout' %}">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-link nav-link" style="display: inline; cursor: pointer;">Logout</button>
                         </form>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Add Post</a>
                     </li>
                 {% else %}
                     <li class="nav-item">

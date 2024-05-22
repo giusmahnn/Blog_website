@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.core.paginator import Paginator
+from django.contrib.auth.decorators import login_required
 from .models import Post, Tag, Category
 # Create your views here.
 
@@ -24,6 +25,8 @@ def post_detail(request, slug):
     '''
     post = get_object_or_404(Post, slug=slug)
     return render(request, 'post_detail.html', {'post':post})
+
+
 
 def search(request):
 

@@ -39,6 +39,7 @@ class CustomUserChangeForm(UserChangeForm):
         )
 
 
+
 class CustomLoginForm(forms.Form):
     username = forms.CharField(max_length=255)
     password = forms.CharField(widget=forms.PasswordInput)
@@ -58,3 +59,35 @@ class CustomLoginForm(forms.Form):
             elif not password:
                 raise forms.ValidationError("Wrong Password")
             return cleaned_data
+        
+
+class PasswordResetRequestForm(forms.Form):
+    email = forms.EmailField(required=True)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        new_password = cleaned_data.get('new_password')
+        confirm_password = cleaned_data.get('confirm_password')
+
+        if new_password and confirm_password:
+            if new_password != confirm_password:
+                raise forms.ValidationError("Password doesn't match")
+        return cleaned_data
+    
+
+class SetPasswordForm(forms.Form):
+    new_password = forms.CharField(label="New Password", widget=forms.PasswordInput)
+    confirm_password = forms.CharField(label="Confirm Password", widget=forms.PasswordInput)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        new_password = cleaned_data.get("new_password")
+        confirm_password = cleaned_data.get("confirm_password")
+
+        if new_password and confirm_password and new_password != confirm_password:
+            raise forms.ValidationError("The two password fields must match.")
+        return cleaned_data
+
+
+class OTPValidationForm(SetPasswordForm):
+    otp = forms.CharField(max_length=6, required=True, help_text="Enter the OTP sent to your email")
