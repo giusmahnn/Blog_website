@@ -57,26 +57,54 @@ def my_profile(request):
     return render(request, 'profile.html', {'user': request.user})
 
 def login_view(request):
-    '''
-    creates an instance for the user to impute the login details, it then extracts the username and 
-    password from the cleaned data and checks it for authentication. 
-    if the user is valid it logs the user in and redirects the user to the post list page if not,
-    it prompts the user to enter details again.
-    '''
     if request.method == 'POST':
         form = CustomLoginForm(request.POST)
         if form.is_valid():
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
+            print("Form is valid")
+            username = form.cleaned_data.get("username")
+            password = form.cleaned_data.get("password")
+            print("Username:", username)
+            print("Entered Password:", password)
+            
             user = authenticate(request, username=username, password=password)
-
             if user is not None:
+                print("Authenticated user:", user.username)
                 login(request, user)
                 return redirect('post_list')
+            else:
+                print("Authentication failed")
+                form.add_error(None, "Invalid username or password")
+        else:
+            print("Form is not valid")
     else:
         form = CustomLoginForm()
     
     return render(request, 'accounts/login.html', {'form': form})
+
+# def login_view(request):
+#     '''
+#     creates an instance for the user to impute the login details, it then extracts the username and 
+#     password from the cleaned data and checks it for authentication. 
+#     if the user is valid it logs the user in and redirects the user to the post list page if not,
+#     it prompts the user to enter details again.
+#     '''
+#     if request.method == 'POST':
+#         form = CustomLoginForm(request.POST)
+#         if form.is_valid():
+#             print("Valid Request")
+#             username = form.cleaned_data['username']
+#             password = form.cleaned_data['password']
+#             print("Entered Password:", password)
+#             user = authenticate(request, username=username, password=password)
+#             print("User Password:", user.password)
+
+#             if user is not None:
+#                 login(request, user)
+#                 return redirect('post_list')
+#     else:
+#         form = CustomLoginForm()
+    
+#     return render(request, 'accounts/login.html', {'form': form})
 
 def logout_view(request):
     if request.method == 'POST':
@@ -112,15 +140,15 @@ def password_reset_confirm(request):
             return render(request, "accounts/password_reset_confirm.html")
 
         try:
-            user = CustomUser.objects.get(otp=otp)
-            user.set_password(new_password)
-            user.otp = ''  # Clear OTP after successful password reset
-            user.save()
-            messages.success(request, "Password has been reset successfully.")
-            return redirect("login")
+            user = CustomUser.objects.get(otp_field=otp)
         except CustomUser.DoesNotExist:
             messages.error(request, "Invalid OTP.")
-            return render(request, "accounts/password_reset_confirm.html")
+            # return render(request, "accounts/password_reset_confirm.html")
+        user.set_password(new_password)
+        user.otp = ''  # Clear OTP after successful password reset
+        user.save()
+        messages.success(request, "Password has been reset successfully.")
+        return redirect("login")
     return render(request, "accounts/password_reset_confirm.html")
 
 # User = get_user_model()    

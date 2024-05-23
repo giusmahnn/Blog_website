@@ -4,17 +4,17 @@ from .forms import CustomUserCreationForm, CustomUserChangeForm
 from .models import CustomUser
 
 
-class CustomUserAdmin(UserAdmin):
-    add_form = CustomUserCreationForm
-    form = CustomUserChangeForm
-    model = CustomUser
-    list_display = [
-            'first_name',
-            'last_name',
-            'username',
-            'email',
-            'age',
-        ]
+# class CustomUserAdmin(UserAdmin):
+#     add_form = CustomUserCreationForm
+#     form = CustomUserChangeForm
+#     model = CustomUser
+#     list_display = [
+#             'first_name',
+#             'last_name',
+#             'username',
+#             'email',
+#             'age',
+#         ]
    
    
-admin.site.register(CustomUser, CustomUserAdmin)
+admin.site.register(CustomUser)
