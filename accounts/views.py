@@ -107,10 +107,20 @@ def password_reset_confirm(request):
         otp = request.POST.get("otp")
         new_password = request.POST.get("new_password")
         confirm_password = request.POST.get("confirm_password")
-        user = CustomUser.objects.get(otp_field=otp)
+        if new_password != confirm_password:
+            messages.error(request, "Passwords do not match.")
+            return render(request, "accounts/password_reset_confirm.html")
 
-        user.set_password(new_password)
-        return redirect("login")
+        try:
+            user = CustomUser.objects.get(otp=otp)
+            user.set_password(new_password)
+            user.otp = ''  # Clear OTP after successful password reset
+            user.save()
+            messages.success(request, "Password has been reset successfully.")
+            return redirect("login")
+        except CustomUser.DoesNotExist:
+            messages.error(request, "Invalid OTP.")
+            return render(request, "accounts/password_reset_confirm.html")
     return render(request, "accounts/password_reset_confirm.html")
 
 # User = get_user_model()    

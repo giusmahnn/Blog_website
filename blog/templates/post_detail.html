@@ -25,6 +25,10 @@
             <li>{{ tag.name }}</li>
         {% endfor %}
     </ul>
+    {% if user.is_authenticated and user == post.author %}
+        <a href="{% url 'post_edit' post.slug %}" class="btn btn-warning mt-3">Edit Post</a>
+        <a href="{% url 'post_delete' post.slug %}" class="btn btn-warning mt-3">Delete Post</a>
+    {% endif %}
     <a href="javascript:history.back()" class="btn btn-secondary mt-3">Back</a>
 </div>
 {% endblock %}

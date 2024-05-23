@@ -1,7 +1,8 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from .models import Post, Tag, Category
+from .forms import PostCreateForm, PostEditForm
 # Create your views here.
 
 
@@ -26,6 +27,36 @@ def post_detail(request, slug):
     post = get_object_or_404(Post, slug=slug)
     return render(request, 'post_detail.html', {'post':post})
 
+@login_required
+def create_post(request):
+    if request.method=='POST':
+        form= PostCreateForm(request.POST, request.FILES)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
+            return redirect('post_list')
+    else:
+        form = PostCreateForm()
+    return render(request, 'create_post.html', {'form':form})
+
+@login_required
+def post_edit(request, slug):
+    post = get_object_or_404(Post, slug=slug)
+    if request.method=='POST': 
+        form = PostEditForm(request.POST, instance=post)
+        if form.is_valid():
+            form.save()
+            return redirect('post_detail', slug=post.slug)
+    else:
+        form= PostEditForm(instance=post)
+    return render(request, 'post_edit.html', {'form': form})
+
+@login_required
+def delete_post(request,slug):
+    post= get_object_or_404(Post, slug=slug)
+    post.delete()
+    return redirect('post_list')
 
 
 def search(request):
