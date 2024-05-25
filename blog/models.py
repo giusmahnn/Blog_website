@@ -47,6 +47,7 @@ class Post(models.Model):
     published_at = models.DateTimeField(blank=True, null=True)
     categories = models.ManyToManyField(Category, related_name='posts')
     tags = models.ManyToManyField(Tag, related_name='posts')
+    liked = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True, related_name='liked')
 
     def __str__(self):
         return self.title
@@ -56,6 +57,28 @@ class Post(models.Model):
             self.slug = slugify(self.title)
         super().save(*args, **kwargs)
 
+    @property
+    def num_likes(self):
+        return self.liked.all().count()
+
+class Like(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    value = models.BooleanField(default=False)
+
+    def __str__(self):
+        return str(self.post)
+
+class Comment(models.Model):
+    post = models.ForeignKey(Post, related_name='comments', on_delete=models.CASCADE)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    body = models.TextField()
+    parent = models.ForeignKey('self', null=True, blank=True, related_name='replies', on_delete=models.CASCADE)
+    parents = models.ManyToManyField('self', blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Comment by {self.author.username} on {self.post.title}'
 
 '''
 The slugify changes text like (hello world) to something like (hello-world or hello+world)

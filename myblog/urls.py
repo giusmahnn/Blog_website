@@ -18,12 +18,15 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-
+from accounts.views import my_profile, home_view,profile_edit
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', home_view, name="home"),
     path('accounts/', include('accounts.urls')),
     path('blog/', include('blog.urls')),
+    path('<str:username>/', my_profile, name="profile"),
+    path('<str:username>/edit/', profile_edit, name="edit_profile")
     
 ]
 

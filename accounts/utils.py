@@ -1,10 +1,8 @@
 import random
 from django.core.mail import EmailMultiAlternatives
-from django.template.loader import render_to_string
-from django.utils.html import strip_tags
 from django.conf import settings
 
-
+# function for otp generation
 def otp_generation():
     return random.randint(100000, 999999)
 

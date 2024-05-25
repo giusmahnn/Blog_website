@@ -1,8 +1,10 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.http import JsonResponse
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
-from .models import Post, Tag, Category
-from .forms import PostCreateForm, PostEditForm
+from django.views.decorators.http import require_POST
+from .models import Post, Tag, Category, Comment
+from .forms import PostCreateForm, PostEditForm, CommentForm
 # Create your views here.
 
 
@@ -25,7 +27,27 @@ def post_detail(request, slug):
     it shows a 404 page error
     '''
     post = get_object_or_404(Post, slug=slug)
-    return render(request, 'post_detail.html', {'post':post})
+    comments = Comment.objects.filter(post=post, parent=None)  # Fetch top-level comments
+    context = {
+        'post': post,
+        'comments': comments,
+    }
+    return render(request, 'post_detail.html', context)
+
+@require_POST
+def post_comment(request, slug):
+    post = get_object_or_404(Post, slug=slug)
+    form = CommentForm(request.POST)
+    if form.is_valid():
+        comment = form.save(commit=False)
+        comment.post = post
+        comment.author = request.user
+        parent_id = request.POST.get('parent_id')
+        if parent_id:
+            comment.parent = Comment.objects.get(id=parent_id)
+        comment.save()
+    return redirect('post_detail', slug=post.slug)
+
 
 @login_required
 def create_post(request):
@@ -58,6 +80,16 @@ def delete_post(request,slug):
     post.delete()
     return redirect('post_list')
 
+
+def like_post(request, slug):
+    post = get_object_or_404(Post, slug=slug)
+    if post.likes.filter(id=request.user.id).exists():
+        post.likes.remove(request.user)
+        liked = False
+    else:
+        post.likes.add(request.user)
+        liked=True
+    return JsonResponse({'liked': liked, 'like_count': post.likes.count()})
 
 def search(request):
 

@@ -5,7 +5,12 @@
 {% block content %}
 <div class="container mt-4">
     <h1 class="mb-4">{{ post.title }}</h1>
-    <p class="text-muted">Posted on {{ post.created_at|date:"F d, Y" }} by {{ post.author.username }}</p>
+    <p class="text-muted">Posted on {{ post.created_at|date:"F d, Y" }} by {{ post.author.username }}
+        {% if user.is_authenticated and user == post.author %}
+        <a href="{% url 'post_edit' post.slug %}" class="btn btn-warning mt-3">Edit Post</a>
+        <a href="{% url 'post_delete' post.slug %}" class="btn btn-warning mt-3">Delete Post</a>
+    {% endif %}
+    </p>
     {% if post.featured_image %}
         <img src="{{ post.featured_image.url }}" class="card-img-top w-25" alt="{{ post.title }}">
     {% endif %}
@@ -25,10 +30,25 @@
             <li>{{ tag.name }}</li>
         {% endfor %}
     </ul>
-    {% if user.is_authenticated and user == post.author %}
-        <a href="{% url 'post_edit' post.slug %}" class="btn btn-warning mt-3">Edit Post</a>
-        <a href="{% url 'post_delete' post.slug %}" class="btn btn-warning mt-3">Delete Post</a>
-    {% endif %}
     <a href="javascript:history.back()" class="btn btn-secondary mt-3">Back</a>
+</div>
+<div>
+    {% with comments.count as total_comments %}
+        <h2>
+        {{ total_comments }} comment{{ total_comments|pluralize }}
+        </h2>
+    {% endwith %}
+    {% for comment in comments %}
+        <div class="comment">
+        <p class="info">
+            Comment {{ forloop.counter }} by {{ comment.name }}
+            {{ comment.created }}
+        </p>
+        {{ comment.body|linebreaks }}
+        </div>
+    {% empty %}
+        <p>There are no comments yet.</p>
+    {% endfor %}
+    {% include "comment_form.html" %}
 </div>
 {% endblock %}

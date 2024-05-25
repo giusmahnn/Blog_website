@@ -9,6 +9,9 @@
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit" class="btn btn-primary">Create Post</button>
+        <div class="d-flex justify-content-between mt-3">
+            <a href="javascript:history.back()" class="btn btn-secondary">Back</a>   
+        </div>
     </form>
 </div>
 {% endblock %}
