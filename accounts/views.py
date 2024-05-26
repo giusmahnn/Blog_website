@@ -10,7 +10,6 @@ from django.contrib import messages
 from django.template.loader import render_to_string
 from .utils import send_email
 from django.urls import reverse
-from django.http import Http404
 
 # Create your views here.
 
@@ -46,22 +45,26 @@ def profile_edit(request, username):
             return redirect(reverse('profile', kwargs={'username': username}))
     return render(request, 'accounts/profile_edit.html', {'form': form})
 
-#@login_required
+
 def my_profile(request, username):
+    # gets the username from the model
     user = get_object_or_404(CustomUser, username=username)
+    # checks if the user is logged in and the profile is requested by the logged in user
+    # it then grants editing functionalities
     editable = request.user.is_authenticated and request.user.username == username
     return render(request, 'accounts/profile.html', {'profile_user': user, 'editable': editable})
 
 def login_view(request):
     if request.method == 'POST':
+        # shows the login form
         form = CustomLoginForm(request.POST)
         if form.is_valid():
-            print("Form is valid")
-            username = form.cleaned_data.get("username")
-            password = form.cleaned_data.get("password")
+            print("Form is valid") # for debugging 
+            username = form.cleaned_data.get("username") # it shows the field for username
+            password = form.cleaned_data.get("password") # it shows the field for password
             print("Username:", username)
             print("Entered Password:", password)
-            
+            # it authenticates the user details that they are correct
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 print("Authenticated user:", user.username)
@@ -73,6 +76,7 @@ def login_view(request):
         else:
             print("Form is not valid")
     else:
+        # if the details are wrong it prompts the user to enter details again
         form = CustomLoginForm()
     
     return render(request, 'accounts/login.html', {'form': form})
@@ -86,9 +90,10 @@ def logout_view(request):
 
 def forgot_password_email(request):
     if request.method == "POST":
+        # gets the email via post method
         email = request.POST.get("email")
-        user = CustomUser.objects.get(email=email)
-        otp = user.save_otp()
+        user = CustomUser.objects.get(email=email) # it gets the email from the model and ensures its the same
+        otp = user.save_otp() # saves the otp to the requested user
         user.save()
 
         context = {
@@ -98,7 +103,7 @@ def forgot_password_email(request):
 
         template = render_to_string("accounts/password_reset_email.html", context)
 
-        send_email(email, template, "Password Reset")
+        send_email(email, template, "Password Reset") # uses the ssend mail funtion to send a mail to the requested user
         return render(request, "accounts/password_reset_confirm.html")
     return render(request, "accounts/password_reset.html")
 
