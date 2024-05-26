@@ -15,7 +15,8 @@
                     <div class="card-body">
                         <h2 class="card-title">{{ post.title }}</h2>
                         <div class="card-footer text-muted">
-                            Posted on {{ post.date_created|date:"F d, Y" }} by {{ post.author.username }}
+                            Posted on {{ post.date_created|date:"F d, Y" }} by 
+                            <a class="nav-link" href="{% url 'profile' post.author.username %}"> {{ post.author.username }}</a>
                         </div>
                         {{ post.body|truncatewords:30|linebreaks}}
                     </div>

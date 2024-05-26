@@ -4,13 +4,17 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h1>{{ user.username }}'s Profile</h1>
-    <p><strong>Email:</strong> {{ user.email }}</p>
+    <h1>{{ profile_user.username }}'s Profile</h1>
+    <p><strong>Email:</strong> {{ profile_user.email }}</p>
     <br>
-    <p><strong>First Name:</strong> {{ user.first_name }}</p>
+    <p><strong>First Name:</strong> {{ profile_user.first_name }}</p>
     <br>
-    <p><strong>Last Name:</strong> {{ user.last_name }}</p>
+    <p><strong>Last Name:</strong> {{ profile_user.last_name }}</p>
     <br>
-    <a href="{% url 'edit_profile' user.username %}" class="btn btn-primary">Edit Profile</a>
+    {% if editable %}
+    <a href="{% url 'edit_profile' profile_user.username %}" class="btn btn-primary">Edit Profile</a>
+    {% endif %}
+    <br><br>
+    <button class="btn btn-secondary" onclick="history.back()">Back</button>
 </div>
 {% endblock %}

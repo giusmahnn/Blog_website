@@ -10,6 +10,7 @@ from django.contrib import messages
 from django.template.loader import render_to_string
 from .utils import send_email
 from django.urls import reverse
+from django.http import Http404
 
 # Create your views here.
 
@@ -45,10 +46,11 @@ def profile_edit(request, username):
             return redirect(reverse('profile', kwargs={'username': username}))
     return render(request, 'accounts/profile_edit.html', {'form': form})
 
-@login_required
+#@login_required
 def my_profile(request, username):
     user = get_object_or_404(CustomUser, username=username)
-    return render(request, 'accounts/profile.html', {'profile_user': user})
+    editable = request.user.is_authenticated and request.user.username == username
+    return render(request, 'accounts/profile.html', {'profile_user': user, 'editable': editable})
 
 def login_view(request):
     if request.method == 'POST':
