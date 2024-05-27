@@ -39,22 +39,18 @@
     <a href="javascript:history.back()" class="btn btn-secondary mt-3">Back</a>
 </div>
 <div>
-    {% with comments.count as total_comments %}
-        <h2>
-        {{ total_comments }} comment{{ total_comments|pluralize }}
-        </h2>
-    {% endwith %}
-    {% for comment in comments %}
-        <div class="comment">
-        <p class="info">
-            Comment {{ forloop.counter }} by {{ comment.name }}
-            {{ comment.created }}
-        </p>
-        {{ comment.body|linebreaks }}
-        </div>
-    {% empty %}
-        <p>There are no comments yet.</p>
-    {% endfor %}
-    {% include "comment_form.html" %}
+    <h3>Comments</h3>
+    <div>
+        {% for comment in comments %}
+            <p><strong>{{ comment.author }}:</strong> {{ comment.body }}</p>
+        {% endfor %}
+    </div>
+
+    <form method="post" action="{% url 'post_comment' post.slug %}">
+        {% csrf_token %}
+        {{ comment_form.as_p }}
+        <button type="submit" class="btn btn-primary">Add Comment</button>
+    </form>
+
 </div>
 {% endblock %}
