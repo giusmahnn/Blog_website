@@ -33,6 +33,7 @@ def post_detail(request, slug):
     context = {
         'post': post,
         'comments': comments,
+        'comment_form': CommentForm
     }
     return render(request, 'post_detail.html', context)
 
