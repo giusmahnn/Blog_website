@@ -16,6 +16,12 @@
     {% endif %}
     <div>
         {{ post.body|safe }}
+        <form action="{% url 'like_post' post.slug %}" method="post">
+            {{ form.as_p }}
+            {% csrf_token %}
+            <p><input type="submit" value="Like {{ like_count }}"></p>
+          </form>
+        <!-- {% include "post_like.html" %} {{ like_count }} -->
     </div>
     <hr>
     <h5>Categories:</h5>

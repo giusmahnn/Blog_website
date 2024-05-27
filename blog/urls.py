@@ -9,7 +9,7 @@ urlpatterns = [
     path('create/', views.create_post, name="create_post"),
     path('edit/<slug:slug>/', views.post_edit,name='post_edit'),
     path('delete/<slug:slug>', views.delete_post, name='post_delete'),
-    path('like/', views.like_post, name='like_post'),
+    path('like/<str:slug>/', views.like_post, name='like_post'),
     path('post/<slug:slug>/comment/',
          views.post_comment, name='post_comment'),
     path('search/', views.search, name='search')

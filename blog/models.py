@@ -2,6 +2,8 @@ from django.db import models
 from django.conf import settings
 from django.utils.text import slugify
 
+from accounts.models import CustomUser
+
 # Create your models here.
 
 class Category(models.Model):
@@ -36,7 +38,7 @@ class Post(models.Model):
     title = models.CharField(max_length=300)
     slug = models.SlugField(max_length=200, unique=True, blank=True, null=True) 
     author = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+        CustomUser,
         on_delete=models.CASCADE,
         related_name='posts'
     )
@@ -47,7 +49,7 @@ class Post(models.Model):
     published_at = models.DateTimeField(blank=True, null=True)
     categories = models.ManyToManyField(Category, related_name='posts')
     tags = models.ManyToManyField(Tag, related_name='posts')
-    liked = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True, related_name='liked')
+    liked = models.ManyToManyField(CustomUser, blank=True, null=True, related_name='likes')
 
     def __str__(self):
         return self.title

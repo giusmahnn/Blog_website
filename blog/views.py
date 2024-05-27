@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from .models import Post, Tag, Category, Comment
 from .forms import PostCreateForm, PostEditForm, CommentForm
+from django.urls import reverse
 # Create your views here.
 
 
@@ -31,6 +32,7 @@ def post_detail(request, slug):
     context = {
         'post': post,
         'comments': comments,
+        "like_count": post.liked.count()
     }
     return render(request, 'post_detail.html', context)
 
@@ -83,13 +85,16 @@ def delete_post(request,slug):
 
 def like_post(request, slug):
     post = get_object_or_404(Post, slug=slug)
-    if post.likes.filter(id=request.user.id).exists():
-        post.likes.remove(request.user)
+    if post.liked.filter(id=request.user.id).exists():
+        post.liked.remove(request.user)
         liked = False
     else:
-        post.likes.add(request.user)
+        post.liked.add(request.user)
         liked=True
-    return JsonResponse({'liked': liked, 'like_count': post.likes.count()})
+    url = reverse("post_detail", args=[slug])
+    # url = reverse("post_detail", kwargs={"slug": slug})
+    return redirect(url)
+
 
 def search(request):
 
