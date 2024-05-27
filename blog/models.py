@@ -85,3 +85,5 @@ class Comment(models.Model):
 '''
 The slugify changes text like (hello world) to something like (hello-world or hello+world)
 '''
+
+# comment
