@@ -98,10 +98,7 @@ def like_post(request, slug):
     else:
         post.liked.add(request.user)
         liked=True
-    url = reverse("post_detail", args=[slug])
-    # url = reverse("post_detail", kwargs={"slug": slug})
-    return redirect(url)
-
+    return JsonResponse({'liked': liked, 'like_count': post.likes.count()})
 
 def search(request):
 

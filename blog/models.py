@@ -75,8 +75,8 @@ class Comment(models.Model):
     post = models.ForeignKey(Post, related_name='comments', on_delete=models.CASCADE)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     body = models.TextField()
-    parent = models.ForeignKey('self', null=True, blank=True, related_name='replies', on_delete=models.CASCADE)
-    parents = models.ManyToManyField('self', blank=True)
+    # parent = models.ForeignKey('self', null=True, blank=True, related_name='replies', on_delete=models.CASCADE)
+    # parents = models.ManyToManyField('self', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -85,3 +85,5 @@ class Comment(models.Model):
 '''
 The slugify changes text like (hello world) to something like (hello-world or hello+world)
 '''
+
+# comment

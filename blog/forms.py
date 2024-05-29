@@ -20,3 +20,4 @@ class CommentForm(forms.ModelForm):
 
 class LikeForm(forms.Form):
     like = forms.CharField(max_length=100)
+    fields = ['body']
