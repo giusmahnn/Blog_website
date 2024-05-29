@@ -28,14 +28,17 @@ def post_detail(request, slug):
     it shows a 404 page error
     '''
     post = get_object_or_404(Post, slug=slug)
-    comments = Comment.objects.filter(post=post, parent=None)  # Fetch top-level comments
+    comments = Comment.objects.filter(post=post)  # Fetch top-level comments
+    comment_form = CommentForm
     context = {
         'post': post,
         'comments': comments,
-        "like_count": post.liked.count()
+        'comment_form': CommentForm
     }
     return render(request, 'post_detail.html', context)
 
+
+@login_required
 @require_POST
 def post_comment(request, slug):
     post = get_object_or_404(Post, slug=slug)
@@ -44,11 +47,15 @@ def post_comment(request, slug):
         comment = form.save(commit=False)
         comment.post = post
         comment.author = request.user
-        parent_id = request.POST.get('parent_id')
-        if parent_id:
-            comment.parent = Comment.objects.get(id=parent_id)
         comment.save()
-    return redirect('post_detail', slug=post.slug)
+        return redirect('post_detail', slug=post.slug)
+    comments = Comment.objects.filter(post=post)
+    context = {
+        'post': post,
+        'comments': comments,
+        'comment_form': form,
+    }
+    return render(request, 'post_detail.html', context)
 
 
 @login_required
