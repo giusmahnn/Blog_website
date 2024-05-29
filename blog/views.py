@@ -33,7 +33,8 @@ def post_detail(request, slug):
     context = {
         'post': post,
         'comments': comments,
-        'comment_form': CommentForm
+        'comment_form': CommentForm,
+        "like_count": post.liked.count(),
     }
     return render(request, 'post_detail.html', context)
 
