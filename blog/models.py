@@ -63,24 +63,17 @@ class Post(models.Model):
     def num_likes(self):
         return self.liked.all().count()
 
-class Like(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    value = models.BooleanField(default=False)
-
-    def __str__(self):
-        return str(self.post)
-
 class Comment(models.Model):
     post = models.ForeignKey(Post, related_name='comments', on_delete=models.CASCADE)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     body = models.TextField()
-    parent = models.ForeignKey('self', null=True, blank=True, related_name='replies', on_delete=models.CASCADE)
-    parents = models.ManyToManyField('self', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f'Comment by {self.author.username} on {self.post.title}'
+    
+class ReplyComment(models.Model):
+    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
 
 '''
 The slugify changes text like (hello world) to something like (hello-world or hello+world)

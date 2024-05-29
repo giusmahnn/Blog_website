@@ -16,7 +16,7 @@ class PostEditForm(forms.ModelForm):
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
-        fields = ['author', 'body']
+        fields = ['body']
 
 class LikeForm(forms.Form):
     like = forms.CharField(max_length=100)
