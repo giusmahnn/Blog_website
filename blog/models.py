@@ -1,5 +1,4 @@
 from django.db import models
-from django.conf import settings
 from django.utils.text import slugify
 
 from accounts.models import CustomUser
@@ -65,7 +64,7 @@ class Post(models.Model):
 
 class Comment(models.Model):
     post = models.ForeignKey(Post, related_name='comments', on_delete=models.CASCADE)
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     body = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -73,7 +72,11 @@ class Comment(models.Model):
         return f'Comment by {self.author.username} on {self.post.title}'
     
 class ReplyComment(models.Model):
+    post = models.ForeignKey(Post, related_name='replies', on_delete=models.CASCADE)
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    body = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    comment = models.ManyToManyField(Comment, related_name='comment')
 
 '''
 The slugify changes text like (hello world) to something like (hello-world or hello+world)

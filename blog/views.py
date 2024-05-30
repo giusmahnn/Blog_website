@@ -33,7 +33,8 @@ def post_detail(request, slug):
     context = {
         'post': post,
         'comments': comments,
-        'comment_form': CommentForm
+        'comment_form': CommentForm,
+        "like_count": post.liked.count()
     }
     return render(request, 'post_detail.html', context)
 
@@ -56,6 +57,10 @@ def post_comment(request, slug):
         'comment_form': form,
     }
     return render(request, 'post_detail.html', context)
+
+@login_required
+def comment_reply(request, slug):
+    pass
 
 
 @login_required
