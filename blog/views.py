@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-from .models import Post, Tag, Category, Comment
+from .models import Post, Tag, Category, Comment, ReplyComment
 from .forms import PostCreateForm, PostEditForm, CommentForm
 from django.urls import reverse
 # Create your views here.
@@ -37,6 +37,30 @@ def post_detail(request, slug):
         "like_count": post.liked.count()
     }
     return render(request, 'post_detail.html', context)
+
+
+@login_required
+@require_POST
+def post_comment_reply(request, pk):
+    comment = Comment.objects.get(id=pk)
+    post = comment.post
+    form = CommentForm(request.POST)
+    if form.is_valid():
+        body = form.cleaned_data.get("body")
+        comment_reply = ReplyComment.objects.create(author=request.user, body=body)
+        comment_reply.save()
+        comment_reply.comment.add(comment)
+        
+        return render(request, "comment_reply.html", {
+        "post": post,})
+    context = {
+        "post": post,
+        "comment": comment,
+        "comment_reply": ReplyComment.objects.filter(comment=comment),
+        "like_count": post.liked.count(),
+        'comment_form': CommentForm,
+    }
+    return render(request, "comment_reply.html", context)    
 
 
 @login_required

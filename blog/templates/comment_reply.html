@@ -16,42 +16,33 @@
     {% endif %}
     <div>
         {{ post.body|safe }}
-        <form action="{% url 'like_post' post.slug %}" method="post">
+        <!-- <form action="" method="post">
             {{ form.as_p }}
             {% csrf_token %}
             <p><input type="submit" value="Like {{ like_count }}"></p>
-          </form>
+          </form> -->
         <!-- {% include "post_like.html" %} {{ like_count }} -->
     </div>
-    <hr>
-    <h5>Categories:</h5>
-    <ul>
-        {% for category in post.categories.all %}
-            <li>{{ category.name }}</li>
-        {% endfor %}
-    </ul>
-    <h5>Tags:</h5>
-    <ul>
-        {% for tag in post.tags.all %}
-            <li>{{ tag.name }}</li>
-        {% endfor %}
-    </ul>
+    <br>
     <a href="javascript:history.back()" class="btn btn-secondary mt-3">Back</a>
 </div>
 <div>
-    <h3>Comments</h3>
+    <h3>Comment</h3>
     <div>
-        {% for comment in comments %}
-            <p><strong>{{ comment.author }}:</strong> <a href="{% url 'comment_reply' comment.id %}">{{ comment.body }}</a> </p>
-
-        {% endfor %}
+        <p>{{ comment.body }}</p>
     </div>
 
-    <form method="post" action="{% url 'post_comment' post.slug %}">
+    <form method="post" action="{% url 'comment_reply' comment.id %}">
         {% csrf_token %}
         {{ comment_form.as_p }}
         <button type="submit" class="btn btn-primary">Add Comment</button>
     </form>
 
 </div>
+        {% for com in comment_reply %}
+
+        <p>{{ com.body }} - {{ com.author }}</p>
+          
+        {% endfor %}
+   
 {% endblock %}
