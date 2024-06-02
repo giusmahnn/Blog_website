@@ -1,9 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import JsonResponse
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-from .models import Post, Tag, Category, Comment, ReplyComment
+from .models import Post, Comment, ReplyComment
 from .forms import PostCreateForm, PostEditForm, CommentForm
 from django.urls import reverse
 # Create your views here.
@@ -81,11 +80,6 @@ def post_comment(request, slug):
         'comment_form': form,
     }
     return render(request, 'post_detail.html', context)
-
-@login_required
-def comment_reply(request, slug):
-    pass
-
 
 @login_required
 def create_post(request):
